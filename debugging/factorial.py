@@ -1,10 +1,15 @@
 #!/usr/bin/python3
 import sys
+
 def factorial(n):
     result = 1
     while n > 1:
         result *= n
-        n -= 1  # Decrement n in each iteration
+        n -= 1  # Décrémente n à chaque itération
     return result
-f = factorial(int(sys.argv[1]))
-print(f)
+
+if len(sys.argv) > 1:
+    f = factorial(int(sys.argv[1]))
+    print(f)
+else:
+    print("Please provide a number as an argument.")
