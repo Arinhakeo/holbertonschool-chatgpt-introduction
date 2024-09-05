@@ -3,37 +3,29 @@ import sys
 
 def factorial(n):
     """
-    Calcule le facteuriel d'un nombre entier non négatif.
+    Compute the factorial of a non-negative integer n using recursion.
 
-    Description de la fonction:
-        La fonction `factorial` calcule le produit de tous les entiers positifs
-        jusqu'à `n` en utilisant la récursion. Le cas de base est `n == 0`,
-        pour lequel la fonction retourne 1, car 0! est défini comme étant égal à 1.
+    Args:
+        n (int): A non-negative integer for which the factorial is to be computed.
 
-    Paramètres:
-        n (int): Un entier non négatif dont nous souhaitons calculer le facteuriel.
+    Returns:
+        int: The factorial of the input integer n.
 
-    Valeurs de retour:
-        int: Le facteuriel de `n`. Si `n` est 0, la fonction retourne 1.
+    Example:
+        factorial(4) returns 24
     """
     if n == 0:
         return 1
     else:
         return n * factorial(n-1)
 
-# Vérifie si un argument est passé en ligne de commande
+# Check that the script is being run with one argument
 if len(sys.argv) != 2:
-    print("Usage: ./factorial_recursive.py <number>")
+    print("Usage: ./factorial_recursive.py <non-negative integer>")
     sys.exit(1)
 
-# Convertit l'argument en entier et calcule le facteuriel
-try:
-    number = int(sys.argv[1])
-    if number < 0:
-        raise ValueError("Le nombre doit être un entier non négatif.")
-except ValueError as e:
-    print(f"Erreur: {e}")
-    sys.exit(1)
+# Get the input integer from command line argument
+f = factorial(int(sys.argv[1]))
 
-f = factorial(number)
+# Print the result
 print(f)

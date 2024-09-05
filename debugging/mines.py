@@ -1,4 +1,4 @@
-x#!/usr/bin/python3
+#!/usr/bin/python3
 import random
 import os
 
@@ -10,9 +10,9 @@ class Minesweeper:
         self.width = width
         self.height = height
         self.mines = set(random.sample(range(width * height), mines))
-        self.field = [[' ' for _ in range(width)] for _ in range(height)]
         self.revealed = [[False for _ in range(width)] for _ in range(height)]
-        self.total_safe_cells = width * height - mines
+        self.total_cells = width * height
+        self.revealed_cells = 0
 
     def print_board(self, reveal=False):
         clear_screen()
@@ -27,13 +27,15 @@ class Minesweeper:
                         count = self.count_mines_nearby(x, y)
                         print(count if count > 0 else ' ', end=' ')
                 else:
-                    print('.', end=' ')
+                    print(' ', end=' ')
             print()
 
     def count_mines_nearby(self, x, y):
         count = 0
         for dx in [-1, 0, 1]:
             for dy in [-1, 0, 1]:
+                if dx == 0 and dy == 0:
+                    continue
                 nx, ny = x + dx, y + dy
                 if 0 <= nx < self.width and 0 <= ny < self.height:
                     if (ny * self.width + nx) in self.mines:
@@ -41,44 +43,41 @@ class Minesweeper:
         return count
 
     def reveal(self, x, y):
-        if self.revealed[y][x]:
-            return True  # Already revealed
         if (y * self.width + x) in self.mines:
             return False
-        self.revealed[y][x] = True
-        if self.count_mines_nearby(x, y) == 0:
-            for dx in [-1, 0, 1]:
-                for dy in [-1, 0, 1]:
-                    nx, ny = x + dx, y + dy
-                    if 0 <= nx < self.width and 0 <= ny < self.height and not self.revealed[ny][nx]:
-                        self.reveal(nx, ny)
+        if not self.revealed[y][x]:
+            self.revealed[y][x] = True
+            self.revealed_cells += 1
+            if self.count_mines_nearby(x, y) == 0:
+                for dx in [-1, 0, 1]:
+                    for dy in [-1, 0, 1]:
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < self.width and 0 <= ny < self.height and not self.revealed[ny][nx]:
+                            self.reveal(nx, ny)
         return True
 
+    def check_win(self):
+        # Win condition: all cells that are not mines must be revealed
+        return self.revealed_cells == (self.total_cells - len(self.mines))
+
     def play(self):
-        revealed_cells = 0
         while True:
             self.print_board()
             try:
-                print("Enter 'x y' to reveal or 'q' to quit.")
-                input_value = input("Enter coordinates (x y): ")
-                if input_value.lower() == 'q':
-                    print("Thank you for playing!")
-                    break
-                x, y = map(int, input_value.split())
-                if x < 0 or x >= self.width or y < 0 or y >= self.height:
-                    print("Coordinates out of range. Try again.")
-                    continue
+                x = int(input("Enter x coordinate: "))
+                y = int(input("Enter y coordinate: "))
                 if not self.reveal(x, y):
                     self.print_board(reveal=True)
                     print("Game Over! You hit a mine.")
                     break
-                revealed_cells = sum(row.count(True) for row in self.revealed)
-                if revealed_cells == self.total_safe_cells:
+                if self.check_win():
                     self.print_board(reveal=True)
-                    print("Congratulations! You've won the game!")
+                    print("Congratulations! You've won the game.")
                     break
             except ValueError:
-                print("Invalid input. Please enter coordinates in the form 'x y'.")
+                print("Invalid input. Please enter numbers only.")
+            except IndexError:
+                print("Coordinates out of bounds. Please enter valid coordinates.")
 
 if __name__ == "__main__":
     game = Minesweeper()
